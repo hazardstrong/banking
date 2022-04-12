@@ -1,2 +1,4 @@
 
 The main functions of the project are: deposit money into an account, make transfers and close an account if necessary.
+This system uses 16 digit for credit card numbers, the first six digits are constant: 400000
+The numbers are verified with the Luhn algorithm.
