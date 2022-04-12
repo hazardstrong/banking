@@ -12,7 +12,7 @@ public class Operations {
         Connection conn = null;
         try {
             // db parameters
-            String url = "jdbc:sqlite:card.s3db";
+            String url = "jdbc:sqlite:card.db";
             // create a connection to the database
             conn = DriverManager.getConnection(url);
 
@@ -50,7 +50,7 @@ public class Operations {
 	//-------------------------------------------------------------------------
 	public static void createNewTable() {
         // SQLite connection string
-        String url = "jdbc:sqlite:card.s3db.db";
+        String url = "jdbc:sqlite:card.db";
 
         // SQL statement for creating a new table
         String sql = "CREATE TABLE IF NOT EXISTS card" +

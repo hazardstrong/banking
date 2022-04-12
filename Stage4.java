@@ -24,8 +24,6 @@ public class Stage4 {
         int[] temp = new int[9];
         int[] pin = new int[4];
         long bin = 400000;
-        int count = 0;
-        String[] nums = new String[count];
         Scanner sc = new Scanner(System.in);
         do {
             System.out.println("1. Create an account\n2. Log into account\n0. Exit");
@@ -76,22 +74,16 @@ public class Stage4 {
                     number = "400000"+s+check;
                     pins = String.join("", IntStream.of(pin).mapToObj(String::valueOf).toArray(String[]::new));
                     app.insert(number, pins);
-                    count++;
-                    for(int i=0; i < nums.length; ++i) {
-                    	if(i == count) {
-                    		nums[i] = number;
-                    	}
-                    }
                     //-----------------------------------------------------------------------
                     break;
 
                 case 2:
                     System.out.println("Enter your card number:");
-                    String c= sc.next();
+                    String currentaccount= sc.next();
                     System.out.println("Enter your PIN:");
                     String p = sc.next();
                     INSERT bln = new INSERT();
-                    if(bln.loginAccount(c, p)) {
+                    if(bln.loginAccount(currentaccount, p)) {
                         System.out.println("You have successfully logged in!");
                         //---------------------------------------------------------
                         do {
@@ -100,9 +92,8 @@ public class Stage4 {
                             
                             switch(opt2) {
                                 case 1:
-                                	
                                     System.out.print("Balance: ");
-                                    bln.readBalance(c);
+                                    bln.readBalance(currentaccount);
                                     break;
                                 case 2:
                                 	System.out.println("Enter income:");
@@ -115,36 +106,51 @@ public class Stage4 {
                                 	String tcard = sc.next();
                                 	//checking Luhn algorithm:
                                 	char[] ch = tcard.toCharArray();
-                                	int[] temp2 = new int[9];
-                                	int x2 = 8;
-                                	for(int i=0; i < 9; ++i) {
-                                		temp2[i] = ch[i+6] -48;
+                                	int[] temp2 = new int[15];
+                                	int x2 = 0;
+                                	for(int i=0; i < 15; ++i) {
+                                		temp2[i] = ch[i] -48;
                                 	}
-                                	for(int i = 0; i < 9; ++i) {
+                                	for(int i = 0; i < 15; ++i) {
                                         if(i == 0 || i%2 == 0) {
                                             temp2[i] = 2*temp2[i];
                                         }
                                     }
-                                    for(int i = 0; i < 9; ++i) {
+                                    for(int i = 0; i < 15; ++i) {
                                         if(temp2[i] >= 10) {
                                             temp2[i] = temp2[i] - 9;
                                         }
                                     }
-                                    for(int i = 0; i < 9; ++i) {
-                                        x2 = x2 + temp[i];
+                                    for(int i = 0; i < 15; ++i) {
+                                        x2 = x2 + temp2[i];
                                     }
-                                	if(tcard.equals(c)) {
+                                	if(tcard.equals(currentaccount)) {
                                 		System.out.println("You can't transfer money to the same account!");
-                                	}else if(((x2+ch[15]-48)%10) != 0 && ch[0] -48 == 4 && ch[1] == 48 && ch[2] == 48 && ch[3] == 48 && ch[4] == 48 && ch[5] == 48) {
+                                		break;
+                                	}else if((bln.transferBoolean(tcard) == false && (x2+ch[15]-48)%10 != 0)) {
                                 		System.out.println("Probably you made a mistake in the card number. Please try again!");
-                                	}else if(((x2+ch[15]-48)%10) == 0 && ch[0] -48 == 4 && ch[1] == 48 && ch[2] == 48 && ch[3] == 48 && ch[4] == 48 && ch[5] == 48) {
-                                		
+                                		break;
+                                	}else if(bln.transferBoolean(tcard) == false && (x2+ch[15]-48)%10 == 0) {
+                                		System.out.println("Such a card does not exist.");
+                                		break;
+                                	}else if(bln.transferBoolean(tcard)) {
+                                		System.out.println("Enter how much money you want to transfer:");
+                                		int tmoney = sc.nextInt();
+                                		if(bln.moneyTransferBoolean(tmoney, currentaccount)) {
+                                			System.out.println("Not enough money!");
+                                			break;
+                                		}else {
+                                			bln.finallyTransfer(tmoney, tcard);
+                                			//minus current account:
+                                			bln.minusFinallyTransfer(tmoney, currentaccount);
+                                			System.out.println("Success!");
+                                			break;
+                                		}
                                 	}
                                 	break;
                                 case 4:
-                                	bln.deleteAccount(c);
+                                	bln.deleteAccount(currentaccount);
                                 	System.out.println("The account has been closed!");
-                                	--count;
                                 	exit2 = false;
                                 	break;
                                 case 5:
